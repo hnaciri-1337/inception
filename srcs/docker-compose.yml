@@ -1,0 +1,86 @@
+version: "3.3"
+services:
+
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - docker_network
+    restart: always
+
+  wordpress:
+    image: wordpress
+    container_name: wordpress
+    build:
+      context: requirements/wordpress
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    env_file:
+      - .env
+    depends_on: 
+      - mariadb
+    networks:
+      - docker_network
+    volumes:
+      - wp_data:/var/www/html/wordpress
+    restart: always
+  
+  nginx:
+    image: nginx
+    container_name: nginx
+    build: ./requirements/nginx
+    env_file:
+      - .env
+    volumes:
+      - wp_data:/var/www/html/wordpress
+    depends_on:
+      - wordpress
+    networks:
+      - docker_network
+    ports:
+      - "443:443"
+    restart: always
+
+  bonus:
+    image: bonus
+    container_name: bonus
+    build: ./requirements/bonus
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: always
+
+networks:
+  docker_network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      device: /Users/hnaciri-/Desktop/Inception/volumes/mariadb
+      o: bind
+      type: none
+  wp_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /Users/hnaciri-/Desktop/Inception/volumes/wordpress
+      o: bind

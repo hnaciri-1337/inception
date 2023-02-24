@@ -1,0 +1,72 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    default                                            :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: hnaciri- <hnaciri-@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/02/03 19:30:53 by hnaciri-          #+#    #+#              #
+#    Updated: 2023/02/24 21:07:59 by hnaciri-         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+server {
+	listen 443 ssl;
+	
+	root /var/www/html/wordpress;
+	
+	ssl_protocols TLSv1.3;
+	ssl_certificate /etc/nginx/cert.crt;
+	ssl_certificate_key /etc/nginx/key.key;
+	client_max_body_size 100m;
+
+	index index.php index.html;
+	server_name _;
+
+	 location / {
+		autoindex on;
+	}
+
+	# pass PHP scripts on Nginx to FastCGI (PHP-FPM) server
+	location ~ \.php$ {
+        fastcgi_pass wordpress:9000;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+	#
+	# location ~ \.php$ {
+	# 	include snippets/fastcgi-php.conf;
+	
+	# 	# With php-fpm (or other unix sockets):
+	# 	fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+	# 	# With php-cgi (or other tcp sockets):
+	# 	fastcgi_pass wordpress:9000;
+	# }
+
+	# deny access to .htaccess files, if Apache's document root
+	# concurs with nginx's one
+	#
+	#location ~ /\.ht {
+	#	deny all;
+	#}
+}
+
+
+# Virtual Host configuration for example.com
+#
+# You can move that to a different file under sites-available/ and symlink that
+# to sites-enabled/ to enable it.
+#
+#server {
+#	listen 80;
+#	listen [::]:80;
+#
+#	server_name example.com;
+#
+#	root /var/www/example.com;
+#	index index.html;
+#
+#	location / {
+#		try_files $uri $uri/ =404;
+#	}
+#}

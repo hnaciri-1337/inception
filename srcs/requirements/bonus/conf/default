@@ -1,0 +1,24 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    default                                            :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: hnaciri- <hnaciri-@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/02/03 19:30:53 by hnaciri-          #+#    #+#              #
+#    Updated: 2023/02/23 20:45:51 by hnaciri-         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+server {
+	listen 8080;
+	
+	root /var/www/html;
+	index index.php index.html;
+	server_name _;
+
+	 location / {
+		autoindex on;
+		try_files $uri $uri/ =404;
+	}
+}
